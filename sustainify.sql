@@ -133,7 +133,7 @@ CREATE TABLE `ratings` (
 -- Table structure for table `swaps`
 --
 
-CREATE TABLE `swaps` (
+CREATE TABLE `swap_details` (
   `id` int(11) NOT NULL,
   `item_id` int(11) DEFAULT NULL,
   `swapper_name` varchar(255) DEFAULT NULL,
@@ -250,7 +250,7 @@ ALTER TABLE `ratings`
 --
 -- Indexes for table `swaps`
 --
-ALTER TABLE `swaps`
+ALTER TABLE `swap_details`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -319,7 +319,7 @@ ALTER TABLE `ratings`
 --
 -- AUTO_INCREMENT for table `swaps`
 --
-ALTER TABLE `swaps`
+ALTER TABLE `swap_details`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
