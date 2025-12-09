@@ -136,3 +136,38 @@ CREATE TABLE transactions (
   FOREIGN KEY (user_to) REFERENCES users(id)
 );
 
+INSERT INTO users (username, password) VALUES
+('admin01', 'pass123'),
+('seller_jane', 'pass234'),
+('buyer_mark', 'pass345'),
+('donor_luis', 'pass456');
+
+INSERT INTO items (user_id, title, description, `condition`, location, category, type, quantity, price) VALUES
+(2, 'Wooden Chair', 'Slightly scratched', 'Used', 'Lipa City', 'Furniture', 'Sell', 1, 350.00),
+(2, 'Old Textbooks', '5 IT books bundle', 'Used', 'Batangas', 'Books', 'Donate', 5, 0.00),
+(1, 'Mouse', 'Good condition', 'Like New', 'Lipa City', 'Electronics', 'Swap', 1, 0.00);
+
+SELECT * FROM users;
+
+UPDATE items
+SET quantity = 2
+WHERE title = 'Wooden Chair';
+
+DELETE FROM items
+WHERE title = 'Old Textbooks';
+
+SELECT b.buyer_name, i.title AS item_name, u.username AS seller_name, b.quantity
+FROM buyers b
+JOIN items i ON b.item_id = i.id
+JOIN users u ON i.user_id = u.id;
+
+SELECT category, COUNT(*) AS total_items
+FROM items
+GROUP BY category;
+
+SELECT title
+FROM items
+WHERE id NOT IN (SELECT item_id FROM buyers);
+
+
+
