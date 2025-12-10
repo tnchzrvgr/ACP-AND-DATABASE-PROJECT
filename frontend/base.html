@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | Sustainify</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="container header-inner">
+
+        <h1 class="logo">
+            <a href="{{ url_for('home') }}">Sustainify</a>
+        </h1>
+
+        <nav class="nav">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('post_item') }}">Post Item</a>
+            <a href="{{ url_for('chat') }}">Messages</a>
+            <a href="{{ url_for('about') }}">About Us</a>
+
+            {% if username %}
+                <span class="user-greeting">Hello, {{ username }}</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
+            {% endif %}
+        </nav>
+
+    </div>
+</header>
+
+    {% block content %}
+        <section class="hero-section">
+            <h2 class="page-title">Discover, Swap & Re-use</h2>
+            <p class="subtitle">Turn unused items into something valuable. Connect with local buyers, swappers, and donors.</p>
+        </section>
+
+        <div class="button-wrapper">
+        <button class="button-17" type="submit">
+            <a href="/login" class="gege">Get Started</a>
+        </button>
+        </div>
+    {% endblock %}
+
+</body>
+</html>
