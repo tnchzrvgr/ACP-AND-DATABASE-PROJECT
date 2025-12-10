@@ -482,34 +482,7 @@ def delete_item(item_id):
     return redirect("/home")
 
 
-@app.route("/swap_requests")
-def swap_requests():
-    if "user_id" not in session:
-        return redirect("/login")
 
-    db = get_db()
-    cursor = db.cursor()
-
-    cursor.execute("""
-        SELECT 
-            sr.id AS request_id,
-            i.title AS item_title,
-            sd.swapper_name,
-            sd.swapper_email,
-            sd.swapper_phone,
-            sr.offered_item,
-            sr.swapper_id
-        FROM swap_requests sr
-        JOIN items i ON sr.item_id = i.id
-        JOIN swap_details sd ON sd.item_id = sr.item_id 
-        AND sd.offered_item = sr.offered_item
-        WHERE i.user_id = %s
-        ORDER BY sr.id DESC
-    """, (session["user_id"],))
-
-    requests = cursor.fetchall()
-
-    return render_template("swap_requests.html", requests=requests)
 
 @app.route("/swap/accept/<int:request_id>", methods=["POST"])
 def accept_swap(request_id):
@@ -577,6 +550,54 @@ def decline_swap(request_id):
 
     flash("Swap declined The swapper has been notified.")
     return redirect("/swap_requests")
+
+@app.route("/requests")
+def swap_requests():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT 
+            sr.id AS request_id,
+            'Swap' AS request_type,
+            i.title AS item_title,
+            sd.swapper_name AS requester_name,
+            sd.swapper_email AS requester_email,
+            sd.swapper_phone AS requester_phone,
+            sr.offered_item AS offered_item,
+            sr.swapper_id AS user_id
+        FROM swap_requests sr
+        JOIN items i ON sr.item_id = i.id
+        JOIN swap_details sd ON sd.item_id = sr.item_id AND sd.offered_item = sr.offered_item
+        WHERE i.user_id = %s
+        ORDER BY sr.id DESC
+    """, (session["user_id"],))
+    swap_requests = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT 
+            d.id AS request_id,
+            'Donate' AS request_type,
+            i.title AS item_title,
+            d.donor_name AS requester_name,
+            d.donor_email AS requester_email,
+            d.donor_phone AS requester_phone,
+            d.pickup_address AS offered_item,
+            NULL AS user_id
+        FROM donations d
+        JOIN items i ON d.item_id = i.id
+        WHERE i.user_id = %s
+        ORDER BY d.id DESC
+    """, (session["user_id"],))
+    donation_requests = cursor.fetchall()
+
+    all_requests = swap_requests + donation_requests
+    all_requests.sort(key=lambda x: x['request_id'], reverse=True)
+
+    return render_template("requests.html", requests=all_requests)
 
 if __name__=="__main__":
     app.run(debug=True)
