@@ -1163,14 +1163,13 @@ select:focus {
     text-decoration: none;
 }
 
-.banner{
-	width: 100%;
-	height: 100vh;
-	background-image:linear-gradient(rgba(0,0,0,0.65),rgba(0,0,0,0.65)),url("bg.jpg") ;
-	background-size: cover;
-	background-position: center;
-	}
-	.logo{
-	width: 150px;
-	cursor: pointer;
-	}
+.btn-swap, .btn-primary {
+    padding: 10px 16px;
+    background-color: #007bff;
+    color: white !important;
+    border-radius: 6px;
+    text-decoration: none;
+}
+.btn-swap:hover {
+    background-color: #0056b3;
+}
