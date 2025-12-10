@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="notifications-section">
+    <h2 class="page-title">Notifications</h2>
+
+    {% if notifications and notifications|length > 0 %}
+        <ul class="notifications-list">
+            {% for note in notifications %}
+                <li class="notification-item {% if note.read_status == 0 %}unread{% endif %}">
+                    {% if note.link %}
+                        <a href="{{ note.link }}">{{ note.message }}</a>
+                    {% else %}
+                        {{ note.message }}
+                    {% endif %}
+                    <span class="timestamp">{{ note.created_at.strftime("%b %d, %Y %H:%M") }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No notifications yet!</p>
+    {% endif %}
+</section>
+{% endblock %}
