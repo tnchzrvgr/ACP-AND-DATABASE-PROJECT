@@ -217,59 +217,48 @@ def buy_item(item_id):
 
             
         elif item["type"] == "Swap":
-            name = request.form["swapper_name"]
-            email = request.form["swapper_email"]
-            phone = request.form["swapper_phone"]
-            offered_item = request.form["offered_item"]
-            offered_item_condition = request.form.get("offered_item_condition", "Used")
-            category = request.form.get("category", "")
-            note = request.form.get("note", "")
+                name = request.form["swapper_name"]
+                email = request.form["swapper_email"]
+                phone = request.form["swapper_phone"]
+                offered_item = request.form["offered_item"]
+                offered_item_condition = request.form.get("offered_item_condition", "Used")
+                category = request.form.get("category", "")
+                note = request.form.get("note", "")
 
-            cursor.execute("""
-                INSERT INTO swap_details 
-                (item_id, swapper_name, swapper_email, swapper_phone, offered_item, offered_item_condition, category, note)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-            """, (item_id, name, email, phone, offered_item, offered_item_condition, category, note))
-            db.commit() 
+                swapper_id = session["user_id"]
+                seller_id = item["user_id"]
 
-            seller_id = item["user_id"]
-            swapper_id = session["user_id"]
+                cursor.execute("""
+                    INSERT INTO swap_details 
+                    (item_id, swapper_name, swapper_email, swapper_phone, offered_item, offered_item_condition, category, note)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                """, (item_id, name, email, phone, offered_item, offered_item_condition, category, note))
+                db.commit()
 
-            message_text = (
-                f"Swap Request for '{item['title']}':\n"
-                f"Name: {name}\n"
-                f"Email: {email}\n"
-                f"Phone: {phone}\n"
-                f"Offered Item: {offered_item}\n"
-                f"Condition: {offered_item_condition}\n"
-                f"Category: {category}\n"
-                f"Note: {note}"
-            )
+                cursor.execute("""
+                    INSERT INTO swap_requests (item_id, swapper_id, offered_item)
+                    VALUES (%s, %s, %s)
+                """, (item_id, swapper_id, offered_item))
+                db.commit()
 
-            cursor.execute("""
-                INSERT INTO messages (sender_id, receiver_id, message)
-                VALUES (%s, %s, %s)
-            """, (swapper_id, seller_id, message_text))
-            db.commit()
+                message_text = f"""
+            Swap Request Received:
+            Name: {name}
+            Email: {email}
+            Phone: {phone}
+            Offered Item: {offered_item}
+            Condition: {offered_item_condition}
+            Category: {category}
+            Note: {note}
+            """
+                cursor.execute("""
+                    INSERT INTO messages (sender_id, receiver_id, message)
+                    VALUES (%s, %s, %s)
+                """, (swapper_id, seller_id, message_text))
+                db.commit()
 
-            subject = f"Your swap request for '{item['title']}' is received"
-            body = (
-                f"Hi {name},\n\n"
-                f"Your swap request for '{item['title']}' has been submitted successfully.\n"
-                f"Offered Item: {offered_item}\n"
-                f"Condition: {offered_item_condition}\n"
-            )
-
-            if category:
-                body += f"Category: {category}\n"
-            if note:
-                body += f"Note: {note}\n"
-
-            body += "\nThank you for using Sustainify!"
-            send_email(email, subject, body)
-
-            flash("Swap request submitted successfully! The seller has been notified.")
-            return redirect(url_for("rate_user", user_id=item["user_id"], item_id=item_id))
+                flash("Swap request submitted successfully!")
+                return redirect(url_for("rate_user", user_id=item["user_id"], item_id=item_id))
 
 
         
@@ -491,6 +480,103 @@ def delete_item(item_id):
 
     flash("Item deleted successfully!")
     return redirect("/home")
+
+
+@app.route("/swap_requests")
+def swap_requests():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT 
+            sr.id AS request_id,
+            i.title AS item_title,
+            sd.swapper_name,
+            sd.swapper_email,
+            sd.swapper_phone,
+            sr.offered_item,
+            sr.swapper_id
+        FROM swap_requests sr
+        JOIN items i ON sr.item_id = i.id
+        JOIN swap_details sd ON sd.item_id = sr.item_id 
+        AND sd.offered_item = sr.offered_item
+        WHERE i.user_id = %s
+        ORDER BY sr.id DESC
+    """, (session["user_id"],))
+
+    requests = cursor.fetchall()
+
+    return render_template("swap_requests.html", requests=requests)
+
+@app.route("/swap/accept/<int:request_id>", methods=["POST"])
+def accept_swap(request_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT sr.*, i.title, sd.swapper_name 
+        FROM swap_requests sr
+        JOIN items i ON sr.item_id = i.id
+        JOIN swap_details sd ON sd.item_id = sr.item_id AND sd.offered_item = sr.offered_item
+        WHERE sr.id=%s
+    """, (request_id,))
+    req = cursor.fetchone()
+
+    if not req:
+        flash("Swap request not found.")
+        return redirect("/swap_requests")
+
+    cursor.execute("UPDATE swap_requests SET status='Accepted' WHERE id=%s", (request_id,))
+    db.commit()
+
+    msg = f"Your swap request for '{req['title']}' has been ACCEPTED!"
+    cursor.execute("""
+        INSERT INTO messages (sender_id, receiver_id, message)
+        VALUES (%s, %s, %s)
+    """, (session["user_id"], req["swapper_id"], msg))
+    db.commit()
+
+    flash("Swap accepted ✔ The swapper has been notified.")
+    return redirect("/swap_requests")
+
+@app.route("/swap/decline/<int:request_id>", methods=["POST"])
+def decline_swap(request_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT sr.*, i.title
+        FROM swap_requests sr
+        JOIN items i ON sr.item_id = i.id
+        WHERE sr.id=%s
+    """, (request_id,))
+    req = cursor.fetchone()
+
+    if not req:
+        flash("Swap request not found.")
+        return redirect("/swap_requests")
+
+    cursor.execute("UPDATE swap_requests SET status='Declined' WHERE id=%s", (request_id,))
+    db.commit()
+
+    msg = f"Your swap request for '{req['title']}' has been DECLINED."
+    cursor.execute("""
+        INSERT INTO messages (sender_id, receiver_id, message)
+        VALUES (%s, %s, %s)
+    """, (session["user_id"], req["swapper_id"], msg))
+    db.commit()
+
+    flash("Swap declined The swapper has been notified.")
+    return redirect("/swap_requests")
 
 if __name__=="__main__":
     app.run(debug=True)
