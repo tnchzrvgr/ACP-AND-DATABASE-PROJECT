@@ -8,26 +8,40 @@
         {% for req in requests %}
         <div class="swap-request-card">
 
-            <div class="swap-info">
+            <div class="request-info">
+                <p><strong>Type:</strong> {{ req.request_type }}</p>
                 <p><strong>Item:</strong> {{ req.item_title }}</p>
-                <p><strong>Swapper Name:</strong> {{ req.swapper_name }}</p>
-                <p><strong>Email:</strong> {{ req.swapper_email }}</p>
-                <p><strong>Phone:</strong> {{ req.swapper_phone }}</p>
-                <p><strong>Offered Item:</strong> {{ req.offered_item }}</p>
+                <p><strong>Name:</strong> {{ req.requester_name }}</p>
+                <p><strong>Email:</strong> {{ req.requester_email }}</p>
+                <p><strong>Phone:</strong> {{ req.requester_phone }}</p>
+                <p><strong>{% if req.request_type == 'Swap' %}Offered Item{% else %}Pickup Address{% endif %}:</strong> {{ req.offered_item }}</p>
             </div>
 
-            <div class="swap-actions">
-
-                <a href="{{ url_for('chat_with_user', user_id=req.swapper_id) }}" class="btn-chat">Chat</a>
-
-                <form action="{{ url_for('accept_swap', request_id=req.request_id) }}" method="POST">
-                    <button type="submit" class="btn-accept">Accept</button>
-                </form>
-
-                <form action="{{ url_for('decline_swap', request_id=req.request_id) }}" method="POST">
-                    <button type="submit" class="btn-decline">Decline</button>
-                </form>
-
+            <div class="request-actions">
+                {% if req.request_type == 'Swap' %}
+                    <button type="submit" class="btn-decline">
+                        <a href="{{ url_for('chat_with_user', user_id=req.user_id) }}" class="btn-chat">Chat</a>
+                    </button>
+                    
+                    {% if req.status != 'Accepted' and req.status != 'Declined' %}
+                    <form action="{{ url_for('accept_swap', request_id=req.request_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-accept">Accept</button>
+                    </form>
+                    <form action="{{ url_for('decline_swap', request_id=req.request_id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn-decline">Decline</button>
+                    </form>
+                    {% else %}
+                        <span>Status: {{ req.status }}</span>
+                    {% endif %}
+                {% else %}
+                    {% if req.status != 'completed' %}
+                    <form action="{{ url_for('complete_donation', donation_id=req.request_id) }}" method="POST">
+                        <button type="submit" class="btn-complete">Accept</button>
+                    </form>
+                    {% else %}
+                        <span>Status: Completed</span>
+                    {% endif %}
+                {% endif %}
             </div>
 
         </div>
