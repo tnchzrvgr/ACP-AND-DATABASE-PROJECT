@@ -174,16 +174,30 @@ def view_item(item_id):
 
 @app.route("/item/<int:item_id>/buy", methods=["GET","POST"])
 def buy_item(item_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
     db = get_db()
     cursor = db.cursor()
     cursor.execute("SELECT * FROM items WHERE id=%s", (item_id,))
     item = cursor.fetchone()
+    
     if not item:
         flash("Item not found")
         return redirect("/home")
 
-    if request.method=="POST":
-        if item["type"]=="Sell":
+    if request.method == "POST":
+        user_id = session["user_id"]
+        username = session["username"]
+        item_title = item["title"]
+        seller_id = item["user_id"]
+
+        def notify(seller_msg, buyer_msg=None):
+            add_notification(seller_id, seller_msg, link=url_for("view_item", item_id=item_id))
+            if buyer_msg:
+                add_notification(user_id, buyer_msg, link=url_for("view_item", item_id=item_id))
+
+        if item["type"] == "Sell":
             name = request.form["buyer_name"]
             email = request.form["buyer_email"]
             phone = request.form["buyer_phone"]
@@ -198,50 +212,66 @@ def buy_item(item_id):
                 (item_id, buyer_name, buyer_email, buyer_phone, quantity, payment_method, delivery_option, delivery_address, note)
                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, (item_id, name, email, phone, quantity, payment_method, delivery_option, delivery_address, note))
-            db.commit() 
+            db.commit()
 
-            subject = f"Your purchase request for '{item['title']}' is received"
+            cursor.execute("""
+                INSERT INTO transactions (item_id, type, user_from, user_to, quantity, status)
+                VALUES (%s, 'Sell', %s, %s, %s, 'Pending')
+            """, (item_id, user_id, seller_id, item["price"]))
+            db.commit()
 
-            body = f"Hi {name},\n\nYour request to buy '{item['title']}' has been submitted successfully.\n" \
+            notify(
+                f"{username} has requested to buy your item '{item_title}'",
+                f"Your purchase request for '{item_title}' has been sent to {item['user_id']}"
+            )
+
+            subject = f"Your purchase request for '{item_title}' is received"
+            body = f"Hi {name},\n\nYour request to buy '{item_title}' has been submitted successfully.\n" \
                 f"Quantity: {quantity}\nPayment Method: {payment_method}\nDelivery Option: {delivery_option}\n"
-
             if delivery_option == "Delivery" and delivery_address:
                 body += f"Delivery Address: {delivery_address}\n"
-
             body += "\nThank you for using Sustainify!"
-
             send_email(email, subject, body)
 
             flash("Purchase request submitted successfully!")
-            return redirect(url_for("rate_user", user_id=item["user_id"], item_id=item_id))
+            return redirect(url_for("home"))
 
-            
         elif item["type"] == "Swap":
-                name = request.form["swapper_name"]
-                email = request.form["swapper_email"]
-                phone = request.form["swapper_phone"]
-                offered_item = request.form["offered_item"]
-                offered_item_condition = request.form.get("offered_item_condition", "Used")
-                category = request.form.get("category", "")
-                note = request.form.get("note", "")
+            name = request.form["swapper_name"]
+            email = request.form["swapper_email"]
+            phone = request.form["swapper_phone"]
+            offered_item = request.form["offered_item"]
+            offered_item_condition = request.form.get("offered_item_condition", "Used")
+            category = request.form.get("category", "")
+            note = request.form.get("note", "")
 
-                swapper_id = session["user_id"]
-                seller_id = item["user_id"]
+            swapper_id = user_id
 
-                cursor.execute("""
-                    INSERT INTO swap_details 
-                    (item_id, swapper_name, swapper_email, swapper_phone, offered_item, offered_item_condition, category, note)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-                """, (item_id, name, email, phone, offered_item, offered_item_condition, category, note))
-                db.commit()
+            cursor.execute("""
+                INSERT INTO swap_details 
+                (item_id, swapper_name, swapper_email, swapper_phone, offered_item, offered_item_condition, category, note)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (item_id, name, email, phone, offered_item, offered_item_condition, category, note))
+            db.commit()
 
-                cursor.execute("""
-                    INSERT INTO swap_requests (item_id, swapper_id, offered_item)
-                    VALUES (%s, %s, %s)
-                """, (item_id, swapper_id, offered_item))
-                db.commit()
+            cursor.execute("""
+                INSERT INTO swap_requests (item_id, swapper_id, offered_item)
+                VALUES (%s, %s, %s)
+            """, (item_id, swapper_id, offered_item))
+            db.commit()
 
-                message_text = f"""
+            cursor.execute("""
+                INSERT INTO transactions (item_id, type, user_from, user_to, quantity, status)
+                VALUES (%s, 'Swap', %s, %s, %s, 'Pending')
+            """, (item_id, user_id, seller_id, 0))
+            db.commit()
+
+            notify(
+                f"{username} has requested to swap for your item '{item_title}'",
+                f"Your swap request for '{item_title}' has been sent to {item['user_id']}"
+            )
+
+            message_text = f"""
             Swap Request Received:
             Name: {name}
             Email: {email}
@@ -251,17 +281,15 @@ def buy_item(item_id):
             Category: {category}
             Note: {note}
             """
-                cursor.execute("""
-                    INSERT INTO messages (sender_id, receiver_id, message)
-                    VALUES (%s, %s, %s)
-                """, (swapper_id, seller_id, message_text))
-                db.commit()
+            cursor.execute("""
+                INSERT INTO messages (sender_id, receiver_id, message)
+                VALUES (%s, %s, %s)
+            """, (swapper_id, seller_id, message_text))
+            db.commit()
 
-                flash("Swap request submitted successfully!")
-                return redirect(url_for("rate_user", user_id=item["user_id"], item_id=item_id))
+            flash("Swap request submitted successfully!")
+            return redirect(url_for("home"))
 
-
-        
         elif item["type"] == "Donate":
             name = request.form["donor_name"]
             email = request.form["donor_email"]
@@ -277,33 +305,39 @@ def buy_item(item_id):
             """, (item_id, name, email, phone, pickup_address, pickup_time, note))
             db.commit()
 
-            subject = f"Your donation request for '{item['title']}' is received"
-            body = (
-                f"Hi {name},\n\n"
-                f"Your donation request for '{item['title']}' has been submitted successfully.\n"
-                f"Pickup Address: {pickup_address}\n"
+            cursor.execute("""
+                INSERT INTO transactions (item_id, type, user_from, user_to, quantity, status)
+                VALUES (%s, 'Donate', %s, %s, %s, 'Pending')
+            """, (item_id, user_id, seller_id, 0))
+            db.commit()
+
+            notify(
+                f"{username} has requested to donate your item '{item_title}'",
+                f"Your donation request for '{item_title}' has been sent to {item['user_id']}"
             )
 
+            subject = f"Your donation request for '{item_title}' is received"
+            body = f"Hi {name},\n\nYour donation request for '{item_title}' has been submitted successfully.\n" \
+                f"Pickup Address: {pickup_address}\n"
             if pickup_time:
                 body += f"Pickup Time: {pickup_time}\n"
             if note:
                 body += f"Note: {note}\n"
-
             body += "\nThank you for using Sustainify!"
-
             send_email(email, subject, body)
 
             flash("Donation request submitted successfully!")
             return redirect(url_for("home"))
 
-
-
-    if item["type"]=="Sell":
+    if item["type"] == "Sell":
         return render_template("buy_item.html", item=item, title="Purchase Item")
-    elif item["type"]=="Swap":
+    elif item["type"] == "Swap":
         return render_template("swap_item.html", item=item, title="Swap Item")
     else:
         return render_template("donate_item.html", item=item, title="Request Donation")
+
+
+
 
 @app.route("/donation/<int:donation_id>/complete")
 def complete_donation(donation_id):
@@ -500,6 +534,11 @@ def accept_swap(request_id):
         WHERE sr.id=%s
     """, (request_id,))
     req = cursor.fetchone()
+    
+    add_notification(
+        req["swapper_id"],
+        f"Your swap request for '{req['title']}' has been ACCEPTED",
+        link=url_for("swap_requests"))
 
     if not req:
         flash("Swap request not found.")
@@ -533,6 +572,11 @@ def decline_swap(request_id):
         WHERE sr.id=%s
     """, (request_id,))
     req = cursor.fetchone()
+    
+    add_notification(
+        req["swapper_id"],
+        f"Your swap request for '{req['title']}' has been DECLINED",
+        link=url_for("swap_requests"))
 
     if not req:
         flash("Swap request not found.")
@@ -575,7 +619,7 @@ def swap_requests():
         WHERE i.user_id = %s
         ORDER BY sr.id DESC
     """, (session["user_id"],))
-    swap_requests = cursor.fetchall()
+    swap_requests = list(cursor.fetchall())
 
     cursor.execute("""
         SELECT 
@@ -592,12 +636,73 @@ def swap_requests():
         WHERE i.user_id = %s
         ORDER BY d.id DESC
     """, (session["user_id"],))
-    donation_requests = cursor.fetchall()
+    donation_requests = list(cursor.fetchall())
 
     all_requests = swap_requests + donation_requests
     all_requests.sort(key=lambda x: x['request_id'], reverse=True)
 
     return render_template("requests.html", requests=all_requests)
 
+@app.route("/notification")
+def notification():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    db = get_db()
+    cursor = db.cursor()
+
+    cursor.execute("""
+        SELECT id, user_id, message, link, read_status, created_at
+        FROM notifications 
+        WHERE user_id=%s 
+        ORDER BY created_at DESC
+    """, (session["user_id"],))
+    user_notifications = cursor.fetchall()
+
+    if user_notifications:
+        cursor.execute("""
+            UPDATE notifications 
+            SET read_status=1 
+            WHERE user_id=%s AND read_status=0
+        """, (session["user_id"],))
+        db.commit()
+
+    return render_template("notification.html", notifications=user_notifications, title="Notifications")
+
+@app.context_processor
+def inject_notifications():
+    if "user_id" in session:
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT id, message, link, read_status, created_at 
+            FROM notifications 
+            WHERE user_id=%s 
+            ORDER BY created_at DESC
+        """, (session["user_id"],))
+        notifications = cursor.fetchall()
+        unread_count = sum(1 for n in notifications if n["read_status"] == 0)
+    else:
+        notifications = []
+        unread_count = 0
+
+    return dict(notifications=notifications, unread_count=unread_count)
+
+
+
+def add_notification(user_id, message, link=None):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("""
+        INSERT INTO notifications (user_id, message, link)
+        VALUES (%s, %s, %s)
+    """, (user_id, message, link))
+    db.commit()
+
+    cursor.execute("SELECT LAST_INSERT_ID() AS notification_id")
+    notif_id = cursor.fetchone()["notification_id"]
+    return notif_id
+
+    
 if __name__=="__main__":
     app.run(debug=True)
