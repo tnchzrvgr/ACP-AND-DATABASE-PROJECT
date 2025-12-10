@@ -17,7 +17,6 @@ body {
     margin: 0 auto;
 }
 
-/* Header */
 .header {
     background: #1b5e20;
     padding: 15px 0;
@@ -54,7 +53,6 @@ body {
     font-weight: 600;
 }
 
-/* Buttons */
 .btn, button {
     display: inline-block;
     padding: 10px 18px;
@@ -79,7 +77,6 @@ body {
 .btn-chat { background: #1976d2; color: white; }
 .btn-delete { background: #d32f2f; color: white; }
 
-/* Main content & sections */
 .main, .flash-container {
     padding: 20px 0;
 }
@@ -100,7 +97,6 @@ body {
     text-align: center;
 }
 
-/* Forms */
 .form-container, .form-box, .auth-container {
     max-width: 700px;
     margin: 40px auto;
@@ -133,7 +129,6 @@ body {
 
 input[type="file"] { padding: 5px; }
 
-/* Grids */
 .grid-3 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -147,7 +142,6 @@ input[type="file"] { padding: 5px; }
     padding: 20px 0;
 }
 
-/* Item Cards */
 .item-card {
     background: white;
     border-radius: 10px;
@@ -178,7 +172,6 @@ input[type="file"] { padding: 5px; }
 .item-desc { margin: 8px 0 15px; color: #555; font-size: 15px; flex: 1; }
 .item-btn { text-align: center; margin-top: auto; }
 
-/* Item Details */
 .item-detail-card, .item-detail {
     max-width: 900px;
     margin: 30px auto;
@@ -209,7 +202,6 @@ input[type="file"] { padding: 5px; }
     gap: 10px;
 }
 
-/* Swap requests */
 .swap-requests-list { max-width: 800px; margin: 40px auto; padding: 20px; }
 
 .swap-request-card {
@@ -228,7 +220,6 @@ input[type="file"] { padding: 5px; }
 
 .empty-text { text-align: center; font-style: italic; color: #666; margin-top: 20px; }
 
-/* Main Content */
 .main-content {
     max-width: 1000px;      
     margin: 40px auto;      
@@ -246,7 +237,6 @@ input[type="file"] { padding: 5px; }
 
 .main-content p { font-size: 1rem; color: #222; }
 
-/* Logo container */
 .logo-container {
     max-width: 300px;
     margin: 20px auto;
@@ -263,7 +253,6 @@ input[type="file"] { padding: 5px; }
     display: inline-block;
 }
 
-/* Chat styles */
 .chat-wrapper {
     display: flex;
     height: 80vh;
@@ -402,9 +391,6 @@ input[type="file"] { padding: 5px; }
     .form-container { margin: 30px 15px; padding: 25px; }
     .auth-container { margin: 40px 20px; padding: 25px; }
 }
-/* ---------------------------- */
-/*     ABOUT PAGE STYLING       */
-/* ---------------------------- */
 
 .about-section {
     padding: 70px 20px;
@@ -421,7 +407,7 @@ input[type="file"] { padding: 5px; }
     flex-wrap: wrap;
 }
 
-/* Logo styling */
+
 .about-logo img {
     width: 200px;
     height: 200px;
@@ -436,7 +422,6 @@ input[type="file"] { padding: 5px; }
     box-shadow: 0 14px 30px rgba(0,0,0,0.18);
 }
 
-/* Text Card */
 .about-card {
     flex: 1 1 500px;
     background: white;
@@ -447,7 +432,6 @@ input[type="file"] { padding: 5px; }
     line-height: 1.75;
 }
 
-/* Title */
 .about-title {
     font-size: 2.2rem;
     color: #1b5e20;
@@ -462,7 +446,6 @@ input[type="file"] { padding: 5px; }
     color: #333;
 }
 
-/* Developer header */
 .dev-title {
     margin-top: 28px;
     font-size: 1.3rem;
@@ -470,7 +453,6 @@ input[type="file"] { padding: 5px; }
     font-weight: bold;
 }
 
-/* Developer list */
 .dev-list {
     list-style: none;
     padding: 0;
@@ -493,13 +475,11 @@ input[type="file"] { padding: 5px; }
     transform: translateX(4px);
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .about-wrapper {
         text-align: center;
@@ -514,9 +494,6 @@ input[type="file"] { padding: 5px; }
         height: 150px;
     }
 }
-/* ---------------------------- */
-/*       MODERN ABOUT PAGE      */
-/* ---------------------------- */
 
 .about-modern {
     padding: 70px 20px;
@@ -524,7 +501,6 @@ input[type="file"] { padding: 5px; }
     min-height: 100vh;
 }
 
-/* Hero Section */
 .about-hero {
     text-align: center;
     margin-bottom: 50px;
@@ -544,7 +520,6 @@ input[type="file"] { padding: 5px; }
     color: #555;
 }
 
-/* Container for cards */
 .about-modern-container {
     max-width: 1100px;
     margin: auto;
@@ -553,7 +528,6 @@ input[type="file"] { padding: 5px; }
     gap: 30px;
 }
 
-/* Glassmorphic cards */
 .glass-card {
     padding: 30px 25px;
     border-radius: 16px;
@@ -576,7 +550,6 @@ input[type="file"] { padding: 5px; }
     font-weight: bold;
 }
 
-/* Logo */
 .about-logo-modern {
     width: 120px;
     display: block;
@@ -585,7 +558,6 @@ input[type="file"] { padding: 5px; }
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* Developers List */
 .dev-list-modern {
     list-style: none;
     padding: 0;
@@ -602,7 +574,6 @@ input[type="file"] { padding: 5px; }
     border-bottom: none;
 }
 
-/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -613,18 +584,14 @@ input[type="file"] { padding: 5px; }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive */
 @media (max-width: 600px) {
     .about-hero h1 { font-size: 2.3rem; }
 }
-/* ------------------------------ */
-/*        HERO BANNER            */
-/* ------------------------------ */
 
 .about-hero {
     width: 100%;
     height: 280px;
-    background: url('/static/banner.jpg') center/cover no-repeat; /* Replace with your banner */
+    background: url('/static/banner.jpg') center/cover no-repeat; 
     position: relative;
     display: flex;
     align-items: center;
@@ -650,11 +617,6 @@ input[type="file"] { padding: 5px; }
     font-weight: bold;
 }
 
-
-/* ------------------------------ */
-/*       ABOUT CONTENT            */
-/* ------------------------------ */
-
 .about-content-wrapper {
     max-width: 1100px;
     margin: 60px auto;
@@ -679,11 +641,6 @@ input[type="file"] { padding: 5px; }
     font-size: 1.05rem;
 }
 
-
-/* ------------------------------ */
-/*         RIGHT IMAGE            */
-/* ------------------------------ */
-
 .about-profile-img {
     width: 280px;
     height: 280px;
@@ -691,11 +648,6 @@ input[type="file"] { padding: 5px; }
     border-radius: 50%;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
-
-
-/* ------------------------------ */
-/*           RESPONSIVE           */
-/* ------------------------------ */
 
 @media (max-width: 768px) {
     .about-content-wrapper {
@@ -707,7 +659,6 @@ input[type="file"] { padding: 5px; }
         margin-top: 20px;
     }
 }
-/* --- HERO SECTION --- */
 .hero-section {
     text-align: center;
     margin-top: 40px;
@@ -725,8 +676,6 @@ input[type="file"] { padding: 5px; }
     font-size: 1.1rem;
 }
 
-
-/* --- PRODUCT GRID --- */
 .shop-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -734,8 +683,6 @@ input[type="file"] { padding: 5px; }
     padding: 20px 40px;
 }
 
-
-/* --- PRODUCT CARD --- */
 .product-card {
     background: #fff;
     border-radius: 14px;
@@ -751,8 +698,6 @@ input[type="file"] { padding: 5px; }
     box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 
-
-/* --- IMAGE WRAPPER --- */
 .img-wrapper {
     height: 220px;
     background: #f4f4f4;
@@ -773,8 +718,6 @@ input[type="file"] { padding: 5px; }
     font-size: 1.2rem;
 }
 
-
-/* --- PRODUCT INFO --- */
 .product-info {
     padding: 20px;
 }
@@ -793,7 +736,6 @@ input[type="file"] { padding: 5px; }
 }
 
 
-/* --- VIEW BUTTON --- */
 .view-btn {
     display: block;
     text-align: center;
@@ -809,7 +751,7 @@ input[type="file"] { padding: 5px; }
 .view-btn:hover {
     background: #0e4a24;
 }
-/* WRAPPER */
+
 .lux-product-wrapper {
     padding: 50px 0;
     display: flex;
@@ -817,7 +759,6 @@ input[type="file"] { padding: 5px; }
     background: #fafafa;
 }
 
-/* GRID LAYOUT */
 .lux-container {
     width: 85%;
     display: grid;
@@ -826,7 +767,6 @@ input[type="file"] { padding: 5px; }
     align-items: start;
 }
 
-/* LEFT SIDE INFO */
 .lux-title {
     font-size: 2.4rem;
     font-weight: 700;
@@ -854,7 +794,6 @@ input[type="file"] { padding: 5px; }
     max-width: 90%;
 }
 
-/* DETAILS LIST */
 .lux-details p {
     margin-bottom: 8px;
     font-size: 0.95rem;
@@ -865,7 +804,6 @@ input[type="file"] { padding: 5px; }
     margin-left: 4px;
 }
 
-/* BUTTONS */
 .lux-buttons {
     margin-top: 30px;
     display: flex;
@@ -885,7 +823,6 @@ input[type="file"] { padding: 5px; }
     border: 1px solid transparent;
 }
 
-/* PRIMARY BLACK BUTTON */
 .lux-black {
     background: #111;
     color: white;
@@ -895,7 +832,6 @@ input[type="file"] { padding: 5px; }
     background: #333;
 }
 
-/* OUTLINE BUTTON */
 .lux-outline {
     background: transparent;
     border: 1px solid #111;
@@ -906,7 +842,6 @@ input[type="file"] { padding: 5px; }
     color: white;
 }
 
-/* DELETE BUTTON */
 .lux-delete {
     background: #cc2b2b;
     color: white;
@@ -915,7 +850,6 @@ input[type="file"] { padding: 5px; }
     background: #a62222;
 }
 
-/* RIGHT-SIDE IMAGE */
 .lux-image img {
     width: 60%;      
     height: auto;    
@@ -926,7 +860,6 @@ input[type="file"] { padding: 5px; }
     background: none;     
     box-shadow: none;     
 }
-/* Place filter on left above items */
 .filter-section {
     width: 100%;
     margin: 0 0 20px 0;
@@ -941,7 +874,6 @@ input[type="file"] { padding: 5px; }
     padding-left: 20px;
 }
 
-/* FILTER ICON BUTTON */
 .filter-icon-btn {
     background: none;
     border: none;
@@ -952,10 +884,9 @@ input[type="file"] { padding: 5px; }
 .filter-icon-btn img {
     width: 32px;
     height: 32px;
-    filter: brightness(0); /* Makes icon black */
+    filter: brightness(0); 
 }
 
-/* Category dropdown */
 .filter-select {
     padding: 6px 10px;
     border-radius: 6px;
@@ -963,11 +894,9 @@ input[type="file"] { padding: 5px; }
     font-size: 14px;
 }
 
-/* Optional: hover effect */
 .filter-icon-btn:hover img {
     filter: brightness(0.35);
 }
-/* Filter container on top-left */
 .filter-section {
     margin: 0 0 20px 0;
 }
@@ -976,10 +905,9 @@ input[type="file"] { padding: 5px; }
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 20px; /* <<< adds left spacing */
+    margin-left: 20px;
 }
 
-/* Clean funnel icon button */
 .filter-btn {
     background: none;
     border: none;
@@ -991,7 +919,6 @@ input[type="file"] { padding: 5px; }
     display: block;
 }
 
-/* Dropdown */
 .filter-select {
     padding: 6px 10px;
     border-radius: 5px;
@@ -1017,7 +944,7 @@ input[type="file"] { padding: 5px; }
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 25px;
-    color: #0a5c33; /* green title */
+    color: #0a5c33;
 }
 
 .form-group {
@@ -1075,7 +1002,7 @@ select:focus {
 .developer-title {
     font-size: 26px;
     font-weight: 700;
-    color: #0a5c33; /* your theme green */
+    color: #0a5c33; 
     margin-bottom: 15px;
 }
 
@@ -1163,13 +1090,4 @@ select:focus {
     text-decoration: none;
 }
 
-.btn-swap, .btn-primary {
-    padding: 10px 16px;
-    background-color: #007bff;
-    color: white !important;
-    border-radius: 6px;
-    text-decoration: none;
-}
-.btn-swap:hover {
-    background-color: #0056b3;
-}
+
